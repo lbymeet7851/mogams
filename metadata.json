@@ -1,0 +1,8 @@
+{
+  "name": "모가중 바이브코딩 아이디어 마당",
+  "description": "2000년대 싸이월드 미니홈피 감성의 모가중학교 교직원 바이브코딩 & 에듀테크 아이디어 제안 및 공감 투표 플랫폼",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

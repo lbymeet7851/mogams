@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'lbymeet12@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidIdea(data) {
+      return data.keys().hasAll(['nickname', 'category', 'title', 'likesCount', 'createdAt', 'status'])
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 100
+        && data.nickname is string && data.nickname.size() <= 50
+        && data.category in ['AI활용', '수업자료제작', '이미지생성', '영상제작', '업무자동화', '글쓰기', '기타']
+        && data.likesCount is number && data.likesCount >= 0
+        && data.status in ['pending', 'in_progress', 'completed']
+        && (!('description' in data) || (data.description is string && data.description.size() <= 300));
+    }
+
+    match /ideas/{ideaId} {
+      allow read: if true;
+      allow create: if isValidIdea(request.resource.data);
+      allow update: if isAdmin() || (
+        isValidIdea(request.resource.data) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likesCount'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /vibe_projects/{projectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /site_stats/{statId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.total is number &&
+                               request.resource.data.today is number &&
+                               request.resource.data.lastDate is string;
+    }
+
+    match /admins/{adminUid} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

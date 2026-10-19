@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "Idea": {
+      "title": "Idea",
+      "description": "교직원 제안 아이디어 및 투표 정보",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nickname": { "type": "string", "maxLength": 50 },
+        "category": {
+          "type": "string",
+          "enum": ["AI활용", "수업자료제작", "이미지생성", "영상제작", "업무자동화", "글쓰기", "기타"]
+        },
+        "title": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 300 },
+        "likesCount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed"]
+        },
+        "vibeAppId": { "type": "string" }
+      },
+      "required": ["nickname", "category", "title", "likesCount", "createdAt", "status"]
+    },
+    "VibeProject": {
+      "title": "VibeProject",
+      "description": "교직원 제안을 바탕으로 실제 바이브코딩으로 제작된 웹앱 아카이브",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "appUrl": { "type": "string", "maxLength": 500 },
+        "category": { "type": "string" },
+        "relatedIdeaId": { "type": "string" },
+        "thumbnailUrl": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "authorEmail": { "type": "string" }
+      },
+      "required": ["title", "description", "appUrl", "category", "createdAt"]
+    },
+    "SiteStats": {
+      "title": "SiteStats",
+      "description": "실제 방문자 수 (Today, Total) 카운터",
+      "type": "object",
+      "properties": {
+        "total": { "type": "number" },
+        "today": { "type": "number" },
+        "lastDate": { "type": "string" }
+      },
+      "required": ["total", "today", "lastDate"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "운영자 권한 정보",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin"] }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/ideas/{ideaId}": {
+      "schema": { "$ref": "#/entities/Idea" },
+      "description": "교직원들이 등록한 아이디어 및 공감 투표 목록"
+    },
+    "/vibe_projects/{projectId}": {
+      "schema": { "$ref": "#/entities/VibeProject" },
+      "description": "실제 바이브코딩으로 제작된 웹앱 카드 목록"
+    },
+    "/site_stats/{statId}": {
+      "schema": { "$ref": "#/entities/SiteStats" },
+      "description": "실제 접속자 수(Today, Total) 통계 데이터"
+    },
+    "/admins/{adminUid}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "운영자 목록"
+    }
+  }
+}
